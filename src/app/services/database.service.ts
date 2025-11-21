@@ -67,4 +67,16 @@ export class DatabaseService extends Dexie {
       }
     });
   }
+
+  async addTicketList(list: TicketList): Promise<string> {
+    return await this.ticketLists.add(list);
+  }
+
+  async updateTicketList(id: string, changes: Partial<TicketList>): Promise<number> {
+    return await this.ticketLists.update(id, changes);
+  }
+
+  async deleteTicketList(id: string): Promise<void> {
+    await this.ticketLists.delete(id);
+  }
 }

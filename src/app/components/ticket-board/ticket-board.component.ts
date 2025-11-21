@@ -22,6 +22,10 @@ export class TicketBoardComponent implements OnInit {
   newTicketTitle: { [listId: string]: string } = {};
   newTicketDescription: { [listId: string]: string } = {};
   showAddForm: { [listId: string]: boolean } = {};
+  showAddColumnForm = signal<boolean>(false);
+  newColumnName = signal<string>('');
+  editingColumnId = signal<string | null>(null);
+  editingColumnName = signal<string>('');
 
   constructor(private db: DatabaseService) {}
 
@@ -136,5 +140,63 @@ export class TicketBoardComponent implements OnInit {
 
   trackByListId(index: number, list: TicketList): string {
     return list.id;
+  }
+
+  toggleAddColumnForm(): void {
+    this.showAddColumnForm.update(value => !value);
+    if (!this.showAddColumnForm()) {
+      this.newColumnName.set('');
+    }
+  }
+
+  async addColumn(): Promise<void> {
+    const name = this.newColumnName().trim();
+    if (!name) {
+      return;
+    }
+
+    const existingLists = this.lists();
+    const maxOrder = existingLists.length > 0 
+      ? Math.max(...existingLists.map(l => l.order)) 
+      : -1;
+
+    const id = name.toLowerCase().replace(/\s+/g, '-');
+    
+    const newList: TicketList = {
+      id,
+      name,
+      order: maxOrder + 1
+    };
+
+    await this.db.addTicketList(newList);
+    await this.loadData();
+
+    this.newColumnName.set('');
+    this.showAddColumnForm.set(false);
+  }
+
+  startEditingColumn(list: TicketList): void {
+    this.editingColumnId.set(list.id);
+    this.editingColumnName.set(list.name);
+  }
+
+  cancelEditingColumn(): void {
+    this.editingColumnId.set(null);
+    this.editingColumnName.set('');
+  }
+
+  async saveColumnName(): Promise<void> {
+    const columnId = this.editingColumnId();
+    const newName = this.editingColumnName().trim();
+
+    if (!columnId || !newName) {
+      return;
+    }
+
+    await this.db.updateTicketList(columnId, { name: newName });
+    await this.loadData();
+
+    this.editingColumnId.set(null);
+    this.editingColumnName.set('');
   }
 }

@@ -4,7 +4,30 @@
   <div class="board-container" cdkDropListGroup>
     <div class="list-column" *ngFor="let list of lists(); trackBy: trackByListId">
       <div class="list-header">
-        <h2>{{ list.name }}</h2>
+        <div class="list-header-content">
+          <h2 *ngIf="editingColumnId() !== list.id" class="list-title">
+            {{ list.name }}
+          </h2>
+          <div *ngIf="editingColumnId() === list.id" class="edit-column-form">
+            <input
+              type="text"
+              [(ngModel)]="editingColumnName"
+              class="column-name-input"
+              (keyup.enter)="saveColumnName()"
+              (keyup.escape)="cancelEditingColumn()">
+            <div class="edit-actions">
+              <button class="save-btn-small" (click)="saveColumnName()" title="Save">✓</button>
+              <button class="cancel-btn-small" (click)="cancelEditingColumn()" title="Cancel">✕</button>
+            </div>
+          </div>
+          <button
+            *ngIf="editingColumnId() !== list.id"
+            class="edit-column-btn"
+            (click)="startEditingColumn(list)"
+            title="Edit column name">
+            ✎
+          </button>
+        </div>
         <span class="ticket-count">{{ ticketsByList()[list.id]?.length || 0 }}</span>
       </div>
 
@@ -54,6 +77,26 @@
             <button class="save-btn" (click)="addTicket(list.id)">Save</button>
             <button class="cancel-btn" (click)="toggleAddForm(list.id)">Cancel</button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="add-column-section">
+      <button *ngIf="!showAddColumnForm()" class="add-column-btn" (click)="toggleAddColumnForm()">
+        + Spalte hinzufügen
+      </button>
+
+      <div *ngIf="showAddColumnForm()" class="add-column-form">
+        <h3>Neue Spalte</h3>
+        <input
+          type="text"
+          [(ngModel)]="newColumnName"
+          placeholder="Spaltenname eingeben"
+          class="column-input"
+          (keyup.enter)="addColumn()">
+        <div class="form-actions">
+          <button class="save-btn" (click)="addColumn()">Hinzufügen</button>
+          <button class="cancel-btn" (click)="toggleAddColumnForm()">Abbrechen</button>
         </div>
       </div>
     </div>
