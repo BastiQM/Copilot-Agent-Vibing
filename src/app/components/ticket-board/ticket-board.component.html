@@ -11,7 +11,8 @@
           <div *ngIf="editingColumnId() === list.id" class="edit-column-form">
             <input
               type="text"
-              [(ngModel)]="editingColumnName"
+              [ngModel]="editingColumnName()"
+              (ngModelChange)="editingColumnName.set($event)"
               class="column-name-input"
               (keyup.enter)="saveColumnName()"
               (keyup.escape)="cancelEditingColumn()">
@@ -90,7 +91,8 @@
         <h3>Neue Spalte</h3>
         <input
           type="text"
-          [(ngModel)]="newColumnName"
+          [ngModel]="newColumnName()"
+          (ngModelChange)="newColumnName.set($event)"
           placeholder="Spaltenname eingeben"
           class="column-input"
           (keyup.enter)="addColumn()">

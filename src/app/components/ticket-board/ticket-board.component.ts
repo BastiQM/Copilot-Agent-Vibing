@@ -160,7 +160,7 @@ export class TicketBoardComponent implements OnInit {
       ? Math.max(...existingLists.map(l => l.order)) 
       : -1;
 
-    const id = name.toLowerCase().replace(/\s+/g, '-');
+    const id = `${name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
     
     const newList: TicketList = {
       id,
